@@ -6,7 +6,11 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	flag "github.com/spf13/pflag"
 )
+
+var zeros = flag.IntP("zeros", "z", 5, "Number of leading zeros.  Default 5")
 
 func encrypt(s string, d int) (string, error) {
 	m := md5.New()
@@ -19,12 +23,14 @@ func encrypt(s string, d int) (string, error) {
 }
 
 func main() {
+	flag.Parse()
 	secretKey := "iwrupvqb"
-	if len(os.Args) > 1 {
-		secretKey = os.Args[1]
+	if flag.NArg() > 0 {
+		secretKey = flag.Args()[0]
 	}
 
 	fmt.Printf("Secret key %q\n", secretKey)
+	prefix := strings.Repeat("0", *zeros)
 	var e string
 	var err error
 	var i int
@@ -35,7 +41,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		if strings.HasPrefix(e, "00000") {
+		if strings.HasPrefix(e, prefix) {
 			break
 		}
 		i++
